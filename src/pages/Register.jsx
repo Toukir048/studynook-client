@@ -1,67 +1,145 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import useAuth from "../hooks/useAuth";
 
 const Register = () => {
-  return (
-    <>
-      <Helmet>
-        <title>StudyNook – Register</title>
-      </Helmet>
+    const { createUser, updateUserProfile, loginWithGoogle } = useAuth();
+    const [passwordError, setPasswordError] = useState("");
+    const navigate = useNavigate();
 
-      <section className="mx-auto flex min-h-[calc(100vh-180px)] max-w-md items-center px-4 py-12">
-        <div className="w-full rounded-3xl bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-bold text-slate-950">Register</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Create your StudyNook account.
-          </p>
+    const validatePassword = (password) => {
+        if (password.length < 6) {
+            return "Password must be at least 6 characters";
+        }
 
-          <form className="mt-6 space-y-4">
-            <input
-              type="text"
-              placeholder="Full name"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-            />
+        if (!/[A-Z]/.test(password)) {
+            return "Password must contain at least one uppercase letter";
+        }
 
-            <input
-              type="email"
-              placeholder="Email address"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-            />
+        if (!/[a-z]/.test(password)) {
+            return "Password must contain at least one lowercase letter";
+        }
 
-            <input
-              type="text"
-              placeholder="Photo URL"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-            />
+        return "";
+    };
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-            />
+    const handleRegister = (event) => {
+        event.preventDefault();
+        setPasswordError("");
 
-            <button className="w-full rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white">
-              Register
-            </button>
+        const form = event.target;
+        const name = form.name.value;
+        const email = form.email.value;
+        const photoURL = form.photoURL.value;
+        const password = form.password.value;
 
-            <button
-              type="button"
-              className="w-full rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700"
-            >
-              Continue with Google
-            </button>
-          </form>
+        const errorMessage = validatePassword(password);
 
-          <p className="mt-5 text-center text-sm text-slate-600">
-            Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-emerald-600">
-              Login
-            </Link>
-          </p>
-        </div>
-      </section>
-    </>
-  );
+        if (errorMessage) {
+            setPasswordError(errorMessage);
+            return;
+        }
+
+        createUser(email, password)
+            .then(() => updateUserProfile(name, photoURL))
+            .then(() => {
+                toast.success("Registration successful! Please login.");
+                navigate("/login");
+            })
+            .catch((error) => {
+                console.log(error);
+                toast.error(error.message);
+            });
+    };
+
+    const handleGoogleLogin = () => {
+        loginWithGoogle()
+            .then(() => {
+                toast.success("Google registration successful");
+                navigate("/");
+            })
+            .catch(() => {
+                toast.error("Google registration failed");
+            });
+    };
+
+    return (
+        <>
+            <Helmet>
+                <title>StudyNook – Register</title>
+            </Helmet>
+
+            <section className="mx-auto flex min-h-[calc(100vh-180px)] max-w-md items-center px-4 py-12">
+                <div className="w-full rounded-3xl bg-white p-8 shadow-sm">
+                    <h1 className="text-3xl font-bold text-slate-950">Register</h1>
+                    <p className="mt-2 text-sm text-slate-500">
+                        Create your StudyNook account.
+                    </p>
+
+                    <form onSubmit={handleRegister} className="mt-6 space-y-4">
+                        <input
+                            type="text"
+                            name="name"
+                            required
+                            placeholder="Full name"
+                            className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+                        />
+
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            placeholder="Email address"
+                            className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+                        />
+
+                        <input
+                            type="text"
+                            name="photoURL"
+                            required
+                            placeholder="Photo URL"
+                            className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+                        />
+
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            placeholder="Password"
+                            className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+                        />
+
+                        {passwordError && (
+                            <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                                {passwordError}
+                            </p>
+                        )}
+
+                        <button className="w-full rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white">
+                            Register
+                        </button>
+
+                        <button
+                            onClick={handleGoogleLogin}
+                            type="button"
+                            className="w-full rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700"
+                        >
+                            Continue with Google
+                        </button>
+                    </form>
+
+                    <p className="mt-5 text-center text-sm text-slate-600">
+                        Already have an account?{" "}
+                        <Link to="/login" className="font-semibold text-emerald-600">
+                            Login
+                        </Link>
+                    </p>
+                </div>
+            </section>
+        </>
+    );
 };
 
 export default Register;

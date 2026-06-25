@@ -1,7 +1,43 @@
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import useAuth from "../hooks/useAuth";
 
 const Login = () => {
+  const { loginUser, loginWithGoogle } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
+
+  const handleLogin = (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const email = form.email.value;
+    const password = form.password.value;
+
+    loginUser(email, password)
+      .then(() => {
+        toast.success("Login successful");
+        navigate(from, { replace: true });
+      })
+      .catch(() => {
+        toast.error("Invalid email or password");
+      });
+  };
+
+  const handleGoogleLogin = () => {
+    loginWithGoogle()
+      .then(() => {
+        toast.success("Google login successful");
+        navigate(from, { replace: true });
+      })
+      .catch(() => {
+        toast.error("Google login failed");
+      });
+  };
+
   return (
     <>
       <Helmet>
@@ -15,15 +51,19 @@ const Login = () => {
             Access your StudyNook dashboard.
           </p>
 
-          <form className="mt-6 space-y-4">
+          <form onSubmit={handleLogin} className="mt-6 space-y-4">
             <input
               type="email"
+              name="email"
+              required
               placeholder="Email address"
               className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
             />
 
             <input
               type="password"
+              name="password"
+              required
               placeholder="Password"
               className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
             />
@@ -33,6 +73,7 @@ const Login = () => {
             </button>
 
             <button
+              onClick={handleGoogleLogin}
               type="button"
               className="w-full rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700"
             >

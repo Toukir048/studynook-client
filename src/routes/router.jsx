@@ -9,6 +9,7 @@ import AddRoom from "../pages/AddRoom";
 import MyListings from "../pages/MyListings";
 import MyBookings from "../pages/MyBookings";
 import NotFound from "../pages/NotFound";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -38,15 +39,27 @@ const router = createBrowserRouter([
       },
       {
         path: "add-room",
-        element: <AddRoom />,
+        element: (
+          <PrivateRoute>
+            <AddRoom />
+          </PrivateRoute>
+        ),
       },
       {
         path: "my-listings",
-        element: <MyListings />,
+        element: (
+          <PrivateRoute>
+            <MyListings />
+          </PrivateRoute>
+        ),
       },
       {
         path: "my-bookings",
-        element: <MyBookings />,
+        element: (
+          <PrivateRoute>
+            <MyBookings />
+          </PrivateRoute>
+        ),
       },
       {
         path: "*",
