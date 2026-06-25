@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useAuth from "../hooks/useAuth";
 
 const PrivateRoute = ({ children }) => {
@@ -6,18 +7,14 @@ const PrivateRoute = ({ children }) => {
   const location = useLocation();
 
   if (authLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-emerald-500"></div>
-      </div>
-    );
+    return <LoadingSpinner message="Checking authentication..." />;
   }
 
-  if (user) {
-    return children;
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <Navigate to="/login" state={{ from: location }} replace />;
+  return children;
 };
 
 export default PrivateRoute;

@@ -6,6 +6,7 @@ import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import EditRoomModal from "../components/EditRoomModal";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import useAuth from "../hooks/useAuth";
 import { deleteRoom, getMyListings, updateRoom } from "../api/roomsApi";
 
@@ -14,17 +15,20 @@ const MyListings = () => {
 
   const [myRooms, setMyRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const loadMyRooms = () => {
     setLoading(true);
+    setError("");
 
     getMyListings()
       .then((data) => {
         setMyRooms(data.rooms || []);
       })
-      .catch(() => {
+      .catch((error) => {
+        setError(error.message || "Failed to load your listings");
         setMyRooms([]);
       })
       .finally(() => {
@@ -37,6 +41,8 @@ const MyListings = () => {
   }, []);
 
   const handleUpdateRoom = (updatedData) => {
+    if (!selectedRoom?._id) return;
+
     updateRoom(selectedRoom._id, updatedData)
       .then((data) => {
         setMyRooms((prevRooms) =>
@@ -54,6 +60,8 @@ const MyListings = () => {
   };
 
   const handleDeleteRoom = () => {
+    if (!deleteTarget?._id) return;
+
     deleteRoom(deleteTarget._id)
       .then(() => {
         setMyRooms((prevRooms) =>
@@ -79,16 +87,24 @@ const MyListings = () => {
           <p className="font-semibold text-emerald-600">
             Logged in as {user?.email}
           </p>
+
           <h1 className="text-3xl font-black text-slate-950 md:text-4xl">
             My Listed Rooms
           </h1>
+
           <p className="mt-2 text-slate-600">
             Manage the study rooms you have added to StudyNook.
           </p>
         </div>
 
         {loading ? (
-          <LoadingSpinner />
+          <LoadingSpinner message="Loading your listings..." />
+        ) : error ? (
+          <ErrorMessage
+            title="Could not load your listings"
+            message={error}
+            onRetry={loadMyRooms}
+          />
         ) : myRooms.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
             {myRooms.map((room) => (
@@ -131,15 +147,17 @@ const MyListings = () => {
 
                   <div className="mt-6 flex flex-wrap gap-3">
                     <button
+                      type="button"
                       onClick={() => setSelectedRoom(room)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white"
+                      className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-slate-800"
                     >
                       <Edit size={18} /> Edit
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => setDeleteTarget(room)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white"
+                      className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
                     >
                       <Trash2 size={18} /> Delete
                     </button>

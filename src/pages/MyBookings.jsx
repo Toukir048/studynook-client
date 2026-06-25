@@ -5,6 +5,7 @@ import { CalendarCheck, Clock, DollarSign, XCircle } from "lucide-react";
 import CancelBookingModal from "../components/CancelBookingModal";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import useAuth from "../hooks/useAuth";
 import { cancelBooking, getMyBookings } from "../api/bookingsApi";
 
@@ -37,16 +38,19 @@ const MyBookings = () => {
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [cancelTarget, setCancelTarget] = useState(null);
 
   const loadBookings = () => {
     setLoading(true);
+    setError("");
 
     getMyBookings()
       .then((data) => {
         setBookings(data.bookings || []);
       })
-      .catch(() => {
+      .catch((error) => {
+        setError(error.message || "Failed to load your bookings");
         setBookings([]);
       })
       .finally(() => {
@@ -59,6 +63,8 @@ const MyBookings = () => {
   }, []);
 
   const handleCancelBooking = () => {
+    if (!cancelTarget?._id) return;
+
     cancelBooking(cancelTarget._id)
       .then((data) => {
         setBookings((prevBookings) =>
@@ -86,16 +92,24 @@ const MyBookings = () => {
           <p className="font-semibold text-emerald-600">
             Logged in as {user?.email}
           </p>
+
           <h1 className="text-3xl font-black text-slate-950 md:text-4xl">
             My Bookings
           </h1>
+
           <p className="mt-2 text-slate-600">
             View and manage your study room bookings.
           </p>
         </div>
 
         {loading ? (
-          <LoadingSpinner />
+          <LoadingSpinner message="Loading your bookings..." />
+        ) : error ? (
+          <ErrorMessage
+            title="Could not load your bookings"
+            message={error}
+            onRetry={loadBookings}
+          />
         ) : bookings.length > 0 ? (
           <div className="grid gap-6">
             {bookings.map((booking) => (
@@ -115,6 +129,7 @@ const MyBookings = () => {
                       <h2 className="text-2xl font-black text-slate-950">
                         {booking.roomName}
                       </h2>
+
                       <p className="mt-1 text-slate-500">{booking.floor}</p>
                     </div>
 
@@ -159,6 +174,7 @@ const MyBookings = () => {
                   <div className="mt-6">
                     {isBookingCancelable(booking) ? (
                       <button
+                        type="button"
                         onClick={() => setCancelTarget(booking)}
                         className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
                       >
@@ -166,6 +182,7 @@ const MyBookings = () => {
                       </button>
                     ) : (
                       <button
+                        type="button"
                         disabled
                         className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-200 px-5 py-3 font-semibold text-slate-500"
                       >

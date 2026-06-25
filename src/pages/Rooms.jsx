@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
 import RoomCard from "../components/RoomCard";
 import SectionHeader from "../components/SectionHeader";
+import ErrorMessage from "../components/ErrorMessage";
 import { getAllRooms } from "../api/roomsApi";
 import { amenitiesOptions } from "../utils/demoRooms";
 
@@ -12,8 +13,9 @@ const Rooms = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedAmenity, setSelectedAmenity] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
+  const loadRooms = useCallback(() => {
     const params = {};
 
     if (searchText.trim()) {
@@ -25,18 +27,24 @@ const Rooms = () => {
     }
 
     setLoading(true);
+    setError("");
 
     getAllRooms(params)
       .then((data) => {
         setRooms(data.rooms || []);
       })
-      .catch(() => {
+      .catch((error) => {
+        setError(error.message || "Failed to load rooms");
         setRooms([]);
       })
       .finally(() => {
         setLoading(false);
       });
   }, [searchText, selectedAmenity]);
+
+  useEffect(() => {
+    loadRooms();
+  }, [loadRooms]);
 
   return (
     <>
@@ -65,6 +73,7 @@ const Rooms = () => {
             onChange={(event) => setSelectedAmenity(event.target.value)}
           >
             <option value="">All Amenities</option>
+
             {amenitiesOptions.map((amenity) => (
               <option key={amenity} value={amenity}>
                 {amenity}
@@ -74,7 +83,13 @@ const Rooms = () => {
         </div>
 
         {loading ? (
-          <LoadingSpinner />
+          <LoadingSpinner message="Loading rooms..." />
+        ) : error ? (
+          <ErrorMessage
+            title="Could not load rooms"
+            message={error}
+            onRetry={loadRooms}
+          />
         ) : rooms.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map((room) => (

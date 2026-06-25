@@ -6,23 +6,33 @@ import SectionHeader from "../components/SectionHeader";
 import PrimaryButton from "../components/PrimaryButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ErrorMessage from "../components/ErrorMessage";
 import { getLatestRooms } from "../api/roomsApi";
 
 const Home = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
+  const loadLatestRooms = () => {
+    setLoading(true);
+    setError("");
+
     getLatestRooms()
       .then((data) => {
         setRooms(data.rooms || []);
       })
-      .catch(() => {
+      .catch((error) => {
+        setError(error.message || "Failed to load latest rooms");
         setRooms([]);
       })
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadLatestRooms();
   }, []);
 
   return (
@@ -75,7 +85,13 @@ const Home = () => {
         />
 
         {loading ? (
-          <LoadingSpinner />
+          <LoadingSpinner message="Loading latest rooms..." />
+        ) : error ? (
+          <ErrorMessage
+            title="Could not load latest rooms"
+            message={error}
+            onRetry={loadLatestRooms}
+          />
         ) : rooms.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map((room) => (

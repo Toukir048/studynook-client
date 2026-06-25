@@ -6,6 +6,7 @@ import BookingModal from "../components/BookingModal";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PrimaryButton from "../components/PrimaryButton";
+import ErrorMessage from "../components/ErrorMessage";
 import useAuth from "../hooks/useAuth";
 import { getRoomById } from "../api/roomsApi";
 
@@ -17,25 +18,44 @@ const RoomDetails = () => {
 
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
-  useEffect(() => {
+  const loadRoomDetails = () => {
     setLoading(true);
+    setError("");
 
     getRoomById(id)
       .then((data) => {
         setRoom(data.room);
       })
-      .catch(() => {
+      .catch((error) => {
         setRoom(null);
+        setError(error.message || "Failed to load room details");
       })
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadRoomDetails();
   }, [id]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="Loading room details..." />;
+  }
+
+  if (error) {
+    return (
+      <section className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
+        <ErrorMessage
+          title="Could not load room details"
+          message={error}
+          onRetry={loadRoomDetails}
+        />
+      </section>
+    );
   }
 
   if (!room) {
@@ -108,6 +128,7 @@ const RoomDetails = () => {
 
             <div className="mt-6">
               <h3 className="mb-3 font-bold">Amenities</h3>
+
               <div className="flex flex-wrap gap-2">
                 {room.amenities?.map((amenity) => (
                   <span
@@ -129,14 +150,14 @@ const RoomDetails = () => {
                 <>
                   <Link
                     to="/my-listings"
-                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-slate-800"
                   >
                     <Edit size={18} /> Manage Room
                   </Link>
 
                   <Link
                     to="/my-listings"
-                    className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white"
+                    className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
                   >
                     <Trash2 size={18} /> Delete Room
                   </Link>
