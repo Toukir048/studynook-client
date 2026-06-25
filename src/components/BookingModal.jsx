@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { createBooking } from "../api/bookingsApi";
 
 const timeSlots = [
   "08:00",
@@ -31,6 +32,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [specialNote, setSpecialNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   if (!isOpen || !room) return null;
 
@@ -67,19 +69,26 @@ const BookingModal = ({ isOpen, onClose, room }) => {
 
     const bookingData = {
       roomId: room._id,
-      roomName: room.roomName,
       date,
       startTime,
       endTime,
       specialNote,
-      totalCost,
     };
 
-    console.log(bookingData);
+    setSubmitting(true);
 
-    toast.success("Booking request created successfully");
-
-    onClose();
+    createBooking(bookingData)
+      .then(() => {
+        toast.success("Room booked successfully");
+        setSpecialNote("");
+        onClose();
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to book room");
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -170,7 +179,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
 
           <div className="rounded-2xl bg-emerald-50 p-4">
             <p className="text-sm font-semibold text-emerald-700">
-              Total Cost
+              Estimated Total
             </p>
             <p className="text-3xl font-black text-emerald-700">
               ${totalCost}
@@ -180,9 +189,10 @@ const BookingModal = ({ isOpen, onClose, room }) => {
           <div className="flex flex-wrap gap-3">
             <button
               type="submit"
-              className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700"
+              disabled={submitting}
+              className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
             >
-              Confirm Booking
+              {submitting ? "Booking..." : "Confirm Booking"}
             </button>
 
             <button

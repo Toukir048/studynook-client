@@ -10,7 +10,7 @@ export const getMyBookings = async () => {
   return response.data;
 };
 
-export const cancelBooking = async (bookingId) => {
-  const response = await apiClient.patch(`/api/bookings/${bookingId}/cancel`);
+export const cancelBooking = async (id) => {
+  const response = await apiClient.patch(`/api/bookings/${id}/cancel`);
   return response.data;
 };

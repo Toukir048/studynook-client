@@ -1,61 +1,55 @@
-import { CalendarX, X } from "lucide-react";
-import PrimaryButton from "./PrimaryButton";
+import { X } from "lucide-react";
 
-const CancelBookingModal = ({ booking, onClose, onConfirm }) => {
+const CancelBookingModal = ({ isOpen, booking, onClose, onConfirm }) => {
+  if (!isOpen || !booking) return null;
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 px-4 py-6">
-      <div className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl md:p-8">
-        <div className="flex items-start justify-between gap-5">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-            <CalendarX size={28} />
-          </div>
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-xl font-black text-slate-950">
+            Cancel this booking?
+          </h2>
 
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"
           >
             <X size={20} />
           </button>
         </div>
 
-        <h2 className="mt-6 text-2xl font-bold text-slate-950">
-          Cancel this booking?
-        </h2>
-
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          You are about to cancel your booking for{" "}
-          <span className="font-semibold text-slate-950">
-            {booking.roomName}
-          </span>{" "}
-          on{" "}
-          <span className="font-semibold text-slate-950">{booking.date}</span>{" "}
-          from{" "}
-          <span className="font-semibold text-slate-950">
-            {booking.startTime}
-          </span>{" "}
-          to{" "}
-          <span className="font-semibold text-slate-950">
-            {booking.endTime}
-          </span>
-          .
+        <p className="text-slate-600">
+          You are cancelling your booking for{" "}
+          <span className="font-bold">{booking.roomName}</span> on{" "}
+          <span className="font-bold">{booking.date}</span> from{" "}
+          <span className="font-bold">{booking.startTime}</span> to{" "}
+          <span className="font-bold">{booking.endTime}</span>.
         </p>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-6 flex justify-end gap-3">
           <button
-            onClick={onConfirm}
-            className="inline-flex w-full items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
-          >
-            Yes, Cancel Booking
-          </button>
-
-          <PrimaryButton
             type="button"
-            variant="light"
             onClick={onClose}
-            className="w-full"
+            className="rounded-xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300"
           >
             Keep Booking
-          </PrimaryButton>
+          </button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-xl bg-red-600 px-5 py-3 font-bold text-white hover:bg-red-700"
+          >
+            Cancel Booking
+          </button>
         </div>
       </div>
     </div>
