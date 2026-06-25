@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
-import { BookOpen, LogOut, Menu, X } from "lucide-react";
+import { BookOpen, ChevronDown, LogOut, Menu, X } from "lucide-react";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 
@@ -11,193 +11,234 @@ const navLinkClass = ({ isActive }) =>
 
 const mobileNavLinkClass = ({ isActive }) =>
   isActive
-    ? "rounded-2xl bg-emerald-50 px-4 py-3 font-semibold text-emerald-600"
-    : "rounded-2xl px-4 py-3 font-medium text-slate-700 hover:bg-slate-100";
+    ? "block rounded-2xl bg-emerald-50 px-4 py-3 font-semibold text-emerald-700"
+    : "block rounded-2xl px-4 py-3 font-semibold text-slate-600 hover:bg-slate-50 hover:text-emerald-600";
 
 const Navbar = () => {
   const { user, logoutUser } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const closeMenu = () => {
-    setIsMenuOpen(false);
+  const closeMenus = () => {
+    setIsMobileMenuOpen(false);
+    setIsProfileOpen(false);
   };
 
   const handleLogout = () => {
     logoutUser()
       .then(() => {
         toast.success("Logged out successfully");
-        setIsMenuOpen(false);
+        closeMenus();
       })
       .catch(() => {
         toast.error("Failed to logout");
       });
   };
 
+  const userPhoto =
+    user?.photoURL || "https://i.ibb.co/2KQnYp7/default-avatar.png";
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-        <Link to="/" onClick={closeMenu} className="flex items-center gap-2">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-white">
-            <BookOpen size={20} />
-          </span>
+      <nav className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="flex items-center justify-between py-4">
+          <Link to="/" onClick={closeMenus} className="flex items-center gap-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-white">
+              <BookOpen size={20} />
+            </span>
 
-          <div>
-            <h2 className="text-xl font-bold leading-none text-slate-950">
-              StudyNook
-            </h2>
-            <p className="text-xs text-slate-500">Quiet rooms. Easy booking.</p>
-          </div>
-        </Link>
-
-        {/* Desktop Menu */}
-        <div className="hidden items-center gap-6 text-sm font-medium md:flex">
-          <NavLink to="/" className={navLinkClass}>
-            Home
-          </NavLink>
-
-          <NavLink to="/rooms" className={navLinkClass}>
-            Rooms
-          </NavLink>
-
-          {user && (
-            <>
-              <NavLink to="/add-room" className={navLinkClass}>
-                Add Room
-              </NavLink>
-
-              <NavLink to="/my-listings" className={navLinkClass}>
-                My Listings
-              </NavLink>
-
-              <NavLink to="/my-bookings" className={navLinkClass}>
-                My Bookings
-              </NavLink>
-            </>
-          )}
-        </div>
-
-        {/* Desktop Auth Area */}
-        <div className="hidden items-center gap-3 md:flex">
-          {user ? (
-            <div className="flex items-center gap-3">
-              <img
-                src={
-                  user.photoURL ||
-                  "https://i.ibb.co/2KQnYp7/default-avatar.png"
-                }
-                alt={user.displayName || "User"}
-                className="h-10 w-10 rounded-full object-cover"
-              />
-
-              <div className="hidden text-right lg:block">
-                <p className="text-sm font-semibold text-slate-900">
-                  {user.displayName || "StudyNook User"}
-                </p>
-                <p className="max-w-[180px] truncate text-xs text-slate-500">
-                  {user.email}
-                </p>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className="rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
-              >
-                <span className="flex items-center gap-2">
-                  <LogOut size={16} />
-                  Logout
-                </span>
-              </button>
+            <div>
+              <h2 className="text-xl font-bold leading-none text-slate-950">
+                StudyNook
+              </h2>
+              <p className="text-xs text-slate-500">
+                Quiet rooms. Easy booking.
+              </p>
             </div>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="rounded-full px-5 py-2 text-sm font-semibold text-slate-700 hover:text-emerald-600"
-              >
-                Login
-              </Link>
+          </Link>
 
-              <Link
-                to="/register"
-                className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-              >
-                Register
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="rounded-xl border border-slate-200 p-2 text-slate-700 md:hidden"
-        >
-          {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </nav>
-
-      {/* Mobile Dropdown Menu */}
-      {isMenuOpen && (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 shadow-lg md:hidden">
-          <div className="flex flex-col gap-2">
-            <NavLink onClick={closeMenu} to="/" className={mobileNavLinkClass}>
+          <div className="hidden items-center gap-6 text-sm font-medium lg:flex">
+            <NavLink to="/" className={navLinkClass}>
               Home
             </NavLink>
 
-            <NavLink
-              onClick={closeMenu}
-              to="/rooms"
-              className={mobileNavLinkClass}
-            >
+            <NavLink to="/rooms" className={navLinkClass}>
               Rooms
             </NavLink>
 
             {user && (
               <>
-                <NavLink
-                  onClick={closeMenu}
-                  to="/add-room"
-                  className={mobileNavLinkClass}
-                >
+                <NavLink to="/add-room" className={navLinkClass}>
                   Add Room
                 </NavLink>
 
-                <NavLink
-                  onClick={closeMenu}
-                  to="/my-listings"
-                  className={mobileNavLinkClass}
-                >
+                <NavLink to="/my-listings" className={navLinkClass}>
                   My Listings
                 </NavLink>
 
-                <NavLink
-                  onClick={closeMenu}
-                  to="/my-bookings"
-                  className={mobileNavLinkClass}
-                >
+                <NavLink to="/my-bookings" className={navLinkClass}>
                   My Bookings
                 </NavLink>
               </>
             )}
+          </div>
 
-            <div className="mt-3 border-t border-slate-100 pt-3">
+          <div className="hidden items-center gap-3 lg:flex">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3 transition hover:border-emerald-300"
+                >
+                  <img
+                    src={userPhoto}
+                    alt={user.displayName || "User"}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+
+                  <div className="text-left">
+                    <p className="max-w-[140px] truncate text-sm font-semibold text-slate-900">
+                      {user.displayName || "StudyNook User"}
+                    </p>
+                    <p className="max-w-[160px] truncate text-xs text-slate-500">
+                      {user.email}
+                    </p>
+                  </div>
+
+                  <ChevronDown
+                    size={16}
+                    className={`text-slate-500 transition ${
+                      isProfileOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-3 w-64 rounded-3xl border border-slate-200 bg-white p-3 shadow-xl shadow-slate-200">
+                    <div className="border-b border-slate-100 px-3 py-3">
+                      <p className="font-semibold text-slate-950">
+                        {user.displayName || "StudyNook User"}
+                      </p>
+                      <p className="mt-1 truncate text-sm text-slate-500">
+                        {user.email}
+                      </p>
+                    </div>
+
+                    <div className="py-2">
+                      <Link
+                        to="/my-listings"
+                        onClick={closeMenus}
+                        className="block rounded-2xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
+                      >
+                        My Listings
+                      </Link>
+
+                      <Link
+                        to="/my-bookings"
+                        onClick={closeMenus}
+                        className="block rounded-2xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
+                      >
+                        My Bookings
+                      </Link>
+                    </div>
+
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="rounded-full px-5 py-2 text-sm font-semibold text-slate-700 hover:text-emerald-600"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="rounded-xl border border-slate-200 p-2 text-slate-700 transition hover:border-emerald-300 hover:text-emerald-600 lg:hidden"
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        {isMobileMenuOpen && (
+          <div className="border-t border-slate-100 py-4 lg:hidden">
+            <div className="space-y-2">
+              <NavLink to="/" onClick={closeMenus} className={mobileNavLinkClass}>
+                Home
+              </NavLink>
+
+              <NavLink
+                to="/rooms"
+                onClick={closeMenus}
+                className={mobileNavLinkClass}
+              >
+                Rooms
+              </NavLink>
+
+              {user && (
+                <>
+                  <NavLink
+                    to="/add-room"
+                    onClick={closeMenus}
+                    className={mobileNavLinkClass}
+                  >
+                    Add Room
+                  </NavLink>
+
+                  <NavLink
+                    to="/my-listings"
+                    onClick={closeMenus}
+                    className={mobileNavLinkClass}
+                  >
+                    My Listings
+                  </NavLink>
+
+                  <NavLink
+                    to="/my-bookings"
+                    onClick={closeMenus}
+                    className={mobileNavLinkClass}
+                  >
+                    My Bookings
+                  </NavLink>
+                </>
+              )}
+            </div>
+
+            <div className="mt-4 border-t border-slate-100 pt-4">
               {user ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
+                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-3">
                     <img
-                      src={
-                        user.photoURL ||
-                        "https://i.ibb.co/2KQnYp7/default-avatar.png"
-                      }
+                      src={userPhoto}
                       alt={user.displayName || "User"}
-                      className="h-10 w-10 rounded-full object-cover"
+                      className="h-12 w-12 rounded-full object-cover"
                     />
 
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="font-semibold text-slate-950">
                         {user.displayName || "StudyNook User"}
                       </p>
-                      <p className="max-w-[230px] truncate text-xs text-slate-500">
+                      <p className="max-w-[240px] truncate text-sm text-slate-500">
                         {user.email}
                       </p>
                     </div>
@@ -205,25 +246,26 @@ const Navbar = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100"
                   >
+                    <LogOut size={16} />
                     Logout
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <Link
-                    onClick={closeMenu}
                     to="/login"
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700"
+                    onClick={closeMenus}
+                    className="rounded-2xl border border-slate-200 px-5 py-3 text-center text-sm font-semibold text-slate-700 hover:text-emerald-600"
                   >
                     Login
                   </Link>
 
                   <Link
-                    onClick={closeMenu}
                     to="/register"
-                    className="rounded-2xl bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
+                    onClick={closeMenus}
+                    className="rounded-2xl bg-slate-950 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
                   >
                     Register
                   </Link>
@@ -231,8 +273,8 @@ const Navbar = () => {
               )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </nav>
     </header>
   );
 };
