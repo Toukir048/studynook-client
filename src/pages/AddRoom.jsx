@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createRoom } from "../api/roomsApi";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { ImagePlus, Layers, Users, DollarSign, FileText } from "lucide-react";
@@ -22,6 +23,11 @@ const AddRoom = () => {
   const handleAddRoom = (event) => {
     event.preventDefault();
 
+    if (selectedAmenities.length === 0) {
+      toast.error("Please select at least one amenity");
+      return;
+    }
+
     const form = event.target;
 
     const newRoom = {
@@ -34,15 +40,15 @@ const AddRoom = () => {
       amenities: selectedAmenities,
     };
 
-    if (selectedAmenities.length === 0) {
-      toast.error("Please select at least one amenity");
-      return;
-    }
-
-    console.log(newRoom);
-    toast.success("Add room form is ready. Backend will be connected later.");
-    form.reset();
-    setSelectedAmenities([]);
+    createRoom(newRoom)
+      .then(() => {
+        toast.success("Room added successfully");
+        form.reset();
+        setSelectedAmenities([]);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to add room");
+      });
   };
 
   return (
@@ -199,11 +205,10 @@ const AddRoom = () => {
                     return (
                       <label
                         key={amenity}
-                        className={`cursor-pointer rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                          isSelected
+                        className={`cursor-pointer rounded-2xl border px-4 py-3 text-sm font-semibold transition ${isSelected
                             ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                             : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300"
-                        }`}
+                          }`}
                       >
                         <input
                           type="checkbox"

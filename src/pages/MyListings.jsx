@@ -1,183 +1,177 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { DollarSign, Layers, Pencil, Trash2, Users } from "lucide-react";
 import toast from "react-hot-toast";
+import { Edit, Trash2 } from "lucide-react";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import EditRoomModal from "../components/EditRoomModal";
 import EmptyState from "../components/EmptyState";
-import PrimaryButton from "../components/PrimaryButton";
-import SectionHeader from "../components/SectionHeader";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useAuth from "../hooks/useAuth";
-import { demoRooms } from "../utils/demoRooms";
+import { deleteRoom, getMyListings, updateRoom } from "../api/roomsApi";
 
 const MyListings = () => {
-    const { user } = useAuth();
+  const { user } = useAuth();
 
-    const initialListings = useMemo(() => {
-        if (!user) return [];
+  const [myRooms, setMyRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
-        return demoRooms.slice(0, 4).map((room) => ({
-            ...room,
-            ownerEmail: user.email,
-            ownerName: user.displayName || "StudyNook User",
-        }));
-    }, [user]);
+  const loadMyRooms = () => {
+    setLoading(true);
 
-    const [myRooms, setMyRooms] = useState(initialListings);
-    const [editingRoom, setEditingRoom] = useState(null);
-    const [deletingRoom, setDeletingRoom] = useState(null);
+    getMyListings()
+      .then((data) => {
+        setMyRooms(data.rooms || []);
+      })
+      .catch(() => {
+        setMyRooms([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
-    useEffect(() => {
-        setMyRooms(initialListings);
-    }, [initialListings]);
+  useEffect(() => {
+    loadMyRooms();
+  }, []);
 
-    const handleUpdateRoom = (updatedRoom) => {
-        setMyRooms((previousRooms) =>
-            previousRooms.map((room) =>
-                room._id === updatedRoom._id ? updatedRoom : room
-            )
+  const handleUpdateRoom = (updatedData) => {
+    updateRoom(selectedRoom._id, updatedData)
+      .then((data) => {
+        setMyRooms((prevRooms) =>
+          prevRooms.map((room) =>
+            room._id === selectedRoom._id ? data.room : room
+          )
         );
-    };
 
-    const handleDeleteRoom = () => {
-        setMyRooms((previousRooms) =>
-            previousRooms.filter((room) => room._id !== deletingRoom._id)
+        toast.success("Room updated successfully");
+        setSelectedRoom(null);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to update room");
+      });
+  };
+
+  const handleDeleteRoom = () => {
+    deleteRoom(deleteTarget._id)
+      .then(() => {
+        setMyRooms((prevRooms) =>
+          prevRooms.filter((room) => room._id !== deleteTarget._id)
         );
 
         toast.success("Room deleted successfully");
-        setDeletingRoom(null);
-    };
+        setDeleteTarget(null);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to delete room");
+      });
+  };
 
-    return (
-        <>
-            <Helmet>
-                <title>StudyNook – My Listings</title>
-            </Helmet>
+  return (
+    <>
+      <Helmet>
+        <title>My Listings | StudyNook</title>
+      </Helmet>
 
-            <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
-                <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-                    <SectionHeader
-                        eyebrow="Owner Dashboard"
-                        title="My Listings"
-                        description="Manage the study rooms you have listed. Edit room details or remove listings when needed."
-                    />
+      <section className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
+        <div className="mb-8">
+          <p className="font-semibold text-emerald-600">
+            Logged in as {user?.email}
+          </p>
+          <h1 className="text-3xl font-black text-slate-950 md:text-4xl">
+            My Listed Rooms
+          </h1>
+          <p className="mt-2 text-slate-600">
+            Manage the study rooms you have added to StudyNook.
+          </p>
+        </div>
 
-                    <PrimaryButton to="/add-room">Add New Room</PrimaryButton>
-                </div>
+        {loading ? (
+          <LoadingSpinner />
+        ) : myRooms.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2">
+            {myRooms.map((room) => (
+              <div
+                key={room._id}
+                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+              >
+                <img
+                  src={room.image}
+                  alt={room.roomName}
+                  className="h-64 w-full object-cover"
+                />
 
-                {myRooms.length > 0 ? (
-                    <div className="grid gap-6">
-                        {myRooms.map((room) => (
-                            <article
-                                key={room._id}
-                                className="grid gap-5 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm lg:grid-cols-[280px_1fr]"
-                            >
-                                <img
-                                    src={room.image}
-                                    alt={room.roomName}
-                                    className="h-64 w-full rounded-[1.5rem] object-cover lg:h-full"
-                                />
-
-                                <div className="flex flex-col p-2">
-                                    <div className="flex flex-col justify-between gap-5 md:flex-row md:items-start">
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-slate-950">
-                                                {room.roomName}
-                                            </h2>
-
-                                            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                                                {room.description}
-                                            </p>
-                                        </div>
-
-                                        <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-center">
-                                            <p className="text-xs font-semibold uppercase text-emerald-700">
-                                                Bookings
-                                            </p>
-                                            <p className="text-2xl font-bold text-emerald-800">
-                                                {room.bookingCount}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-5 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
-                                        <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-3">
-                                            <Layers size={17} className="text-emerald-600" />
-                                            <span>{room.floor}</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-3">
-                                            <Users size={17} className="text-emerald-600" />
-                                            <span>{room.capacity} people</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 rounded-2xl bg-slate-50 p-3">
-                                            <DollarSign size={17} className="text-emerald-600" />
-                                            <span>${room.hourlyRate}/hr</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-5 flex flex-wrap gap-2">
-                                        {room.amenities.map((amenity) => (
-                                            <span
-                                                key={amenity}
-                                                className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700"
-                                            >
-                                                {amenity}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row">
-                                        <PrimaryButton
-                                            type="button"
-                                            variant="light"
-                                            onClick={() => setEditingRoom(room)}
-                                            className="w-full sm:w-auto"
-                                        >
-                                            <Pencil size={16} />
-                                            Edit
-                                        </PrimaryButton>
-
-                                        <button
-                                            onClick={() => setDeletingRoom(room)}
-                                            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-50 px-6 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100 sm:w-auto"
-                                        >
-                                            <Trash2 size={16} />
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
+                <div className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-slate-950">
+                        {room.roomName}
+                      </h2>
+                      <p className="mt-1 text-slate-500">{room.floor}</p>
                     </div>
-                ) : (
-                    <EmptyState
-                        title="You have no listings yet"
-                        description="Start by adding your first study room listing."
-                        buttonText="Add Room"
-                        buttonTo="/add-room"
-                    />
-                )}
-            </section>
 
-            {editingRoom && (
-                <EditRoomModal
-                    room={editingRoom}
-                    onClose={() => setEditingRoom(null)}
-                    onUpdate={handleUpdateRoom}
-                />
-            )}
+                    <p className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
+                      {room.bookingCount || 0} bookings
+                    </p>
+                  </div>
 
-            {deletingRoom && (
-                <DeleteConfirmModal
-                    roomName={deletingRoom.roomName}
-                    onClose={() => setDeletingRoom(null)}
-                    onConfirm={handleDeleteRoom}
-                />
-            )}
-        </>
-    );
+                  <p className="mt-4 text-slate-600">{room.description}</p>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {room.amenities?.map((amenity) => (
+                      <span
+                        key={amenity}
+                        className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700"
+                      >
+                        {amenity}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => setSelectedRoom(room)}
+                      className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white"
+                    >
+                      <Edit size={18} /> Edit
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteTarget(room)}
+                      className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white"
+                    >
+                      <Trash2 size={18} /> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No listed rooms yet"
+            message="Rooms you add will appear here."
+          />
+        )}
+      </section>
+
+      <EditRoomModal
+        isOpen={!!selectedRoom}
+        room={selectedRoom}
+        onClose={() => setSelectedRoom(null)}
+        onUpdate={handleUpdateRoom}
+      />
+
+      <DeleteConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete this room?"
+        message="This action cannot be undone."
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteRoom}
+      />
+    </>
+  );
 };
 
 export default MyListings;

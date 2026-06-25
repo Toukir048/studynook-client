@@ -1,148 +1,118 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  CalendarCheck,
-  DollarSign,
-  Layers,
-  Pencil,
-  Trash2,
-  Users,
-} from "lucide-react";
-import toast from "react-hot-toast";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { CalendarCheck, Edit, Trash2, Users } from "lucide-react";
 import BookingModal from "../components/BookingModal";
 import EmptyState from "../components/EmptyState";
+import LoadingSpinner from "../components/LoadingSpinner";
 import PrimaryButton from "../components/PrimaryButton";
-import SectionHeader from "../components/SectionHeader";
 import useAuth from "../hooks/useAuth";
-import { demoRooms } from "../utils/demoRooms";
+import { getRoomById } from "../api/roomsApi";
 
 const RoomDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [room, setRoom] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
-  const room = demoRooms.find((item) => item._id === id);
+  useEffect(() => {
+    setLoading(true);
+
+    getRoomById(id)
+      .then((data) => {
+        setRoom(data.room);
+      })
+      .catch(() => {
+        setRoom(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [id]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   if (!room) {
     return (
-      <>
-        <Helmet>
-          <title>StudyNook – Room Not Found</title>
-        </Helmet>
-
-        <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
-          <EmptyState
-            title="Room not found"
-            description="The room you are looking for does not exist in the demo data."
-            buttonText="Back to Rooms"
-            buttonTo="/rooms"
-          />
-        </section>
-      </>
+      <EmptyState
+        title="Room not found"
+        message="The room you are looking for does not exist."
+      />
     );
   }
 
-  const isOwner = user?.email && room.ownerEmail === user.email;
+  const isOwner = user?.email === room.ownerEmail;
 
   const handleBookNow = () => {
     if (!user) {
-      navigate("/login", {
-        state: {
-          from: {
-            pathname: `/rooms/${room._id}`,
-          },
-        },
-      });
+      navigate("/login", { state: { from: location } });
       return;
     }
 
     setIsBookingOpen(true);
   };
 
-  const handleDeleteDemo = () => {
-    toast.error("Delete will be connected with backend later.");
-  };
-
-  const handleEditDemo = () => {
-    toast("Edit modal/page will be added later.");
-  };
-
   return (
     <>
       <Helmet>
-        <title>StudyNook – {room.roomName}</title>
+        <title>{room.roomName} | StudyNook</title>
       </Helmet>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
-        <div className="mb-8">
-          <Link
-            to="/rooms"
-            className="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
-          >
-            ← Back to rooms
-          </Link>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="overflow-hidden rounded-[2rem] bg-white p-4 shadow-sm">
+      <section className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div>
             <img
               src={room.image}
               alt={room.roomName}
-              className="h-[460px] w-full rounded-[1.5rem] object-cover"
+              className="h-[420px] w-full rounded-3xl object-cover shadow-lg"
             />
           </div>
 
-          <div className="rounded-[2rem] bg-white p-6 shadow-sm md:p-8">
-            <SectionHeader
-              eyebrow="Room Details"
-              title={room.roomName}
-              description={room.description}
-            />
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="mb-3 text-sm font-semibold text-emerald-600">
+              {room.floor}
+            </p>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <Layers className="mb-3 text-emerald-600" size={22} />
-                <p className="text-sm text-slate-500">Floor</p>
-                <p className="font-bold text-slate-950">{room.floor}</p>
-              </div>
+            <h1 className="text-3xl font-black text-slate-950 md:text-4xl">
+              {room.roomName}
+            </h1>
 
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <Users className="mb-3 text-emerald-600" size={22} />
+            <p className="mt-4 text-slate-600">{room.description}</p>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl bg-slate-100 p-4">
+                <Users className="mb-2 text-emerald-600" size={22} />
                 <p className="text-sm text-slate-500">Capacity</p>
-                <p className="font-bold text-slate-950">
-                  {room.capacity} people
-                </p>
+                <p className="font-bold">{room.capacity} People</p>
               </div>
 
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <DollarSign className="mb-3 text-emerald-600" size={22} />
-                <p className="text-sm text-slate-500">Hourly Rate</p>
-                <p className="font-bold text-slate-950">
+              <div className="rounded-2xl bg-slate-100 p-4">
+                <CalendarCheck className="mb-2 text-emerald-600" size={22} />
+                <p className="text-sm text-slate-500">Bookings</p>
+                <p className="font-bold">{room.bookingCount || 0}</p>
+              </div>
+
+              <div className="rounded-2xl bg-slate-100 p-4">
+                <p className="text-sm text-slate-500">Rate</p>
+                <p className="text-2xl font-black text-slate-950">
                   ${room.hourlyRate}/hr
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <CalendarCheck className="mb-3 text-emerald-600" size={22} />
-                <p className="text-sm text-slate-500">Booking Count</p>
-                <p className="font-bold text-slate-950">
-                  {room.bookingCount} bookings
                 </p>
               </div>
             </div>
 
             <div className="mt-6">
-              <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">
-                Amenities
-              </h3>
-
+              <h3 className="mb-3 font-bold">Amenities</h3>
               <div className="flex flex-wrap gap-2">
-                {room.amenities.map((amenity) => (
+                {room.amenities?.map((amenity) => (
                   <span
                     key={amenity}
-                    className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
+                    className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700"
                   >
                     {amenity}
                   </span>
@@ -150,55 +120,38 @@ const RoomDetails = () => {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <PrimaryButton onClick={handleBookNow} className="w-full sm:w-auto">
+            <div className="mt-8 flex flex-wrap gap-3">
+              <PrimaryButton onClick={handleBookNow} variant="green">
                 {user ? "Book Now" : "Login to Book"}
               </PrimaryButton>
 
               {isOwner && (
                 <>
-                  <PrimaryButton
-                    type="button"
-                    variant="light"
-                    onClick={handleEditDemo}
-                    className="w-full sm:w-auto"
+                  <Link
+                    to="/my-listings"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white"
                   >
-                    <Pencil size={16} />
-                    Edit
-                  </PrimaryButton>
+                    <Edit size={18} /> Manage Room
+                  </Link>
 
-                  <button
-                    onClick={handleDeleteDemo}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-50 px-6 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100 sm:w-auto"
+                  <Link
+                    to="/my-listings"
+                    className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white"
                   >
-                    <Trash2 size={16} />
-                    Delete
-                  </button>
+                    <Trash2 size={18} /> Delete Room
+                  </Link>
                 </>
               )}
             </div>
           </div>
         </div>
-
-        <div className="mt-10 rounded-[2rem] bg-slate-950 p-6 text-white md:p-8">
-          <h2 className="text-2xl font-bold">Booking rules</h2>
-          <div className="mt-5 grid gap-4 text-sm text-slate-300 md:grid-cols-3">
-            <p className="rounded-2xl bg-white/10 p-4">
-              Bookings must be made for today or a future date.
-            </p>
-            <p className="rounded-2xl bg-white/10 p-4">
-              Minimum booking duration is one hour.
-            </p>
-            <p className="rounded-2xl bg-white/10 p-4">
-              Backend will prevent overlapping confirmed bookings.
-            </p>
-          </div>
-        </div>
       </section>
 
-      {isBookingOpen && (
-        <BookingModal room={room} onClose={() => setIsBookingOpen(false)} />
-      )}
+      <BookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        room={room}
+      />
     </>
   );
 };

@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
-import toast from "react-hot-toast";
 import { X } from "lucide-react";
-import PrimaryButton from "./PrimaryButton";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 const timeSlots = [
   "08:00",
@@ -19,40 +18,50 @@ const timeSlots = [
   "20:00",
 ];
 
-const getHour = (time) => Number(time.split(":")[0]);
-
 const getTodayDate = () => {
   return new Date().toISOString().split("T")[0];
 };
 
-const BookingModal = ({ room, onClose }) => {
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+const getHour = (time) => {
+  return Number(time.split(":")[0]);
+};
+
+const BookingModal = ({ isOpen, onClose, room }) => {
+  const [date, setDate] = useState(getTodayDate());
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("10:00");
   const [specialNote, setSpecialNote] = useState("");
 
-  const endTimeOptions = useMemo(() => {
-    if (!startTime) return [];
-    return timeSlots.filter((slot) => getHour(slot) > getHour(startTime));
-  }, [startTime]);
+  if (!isOpen || !room) return null;
 
-  const totalCost = useMemo(() => {
-    if (!startTime || !endTime) return 0;
+  const availableEndTimes = timeSlots.filter(
+    (slot) => getHour(slot) > getHour(startTime)
+  );
 
-    const duration = getHour(endTime) - getHour(startTime);
-    return duration * room.hourlyRate;
-  }, [startTime, endTime, room.hourlyRate]);
+  const duration = getHour(endTime) - getHour(startTime);
+  const totalCost = duration > 0 ? duration * Number(room.hourlyRate) : 0;
 
   const handleStartTimeChange = (event) => {
-    setStartTime(event.target.value);
-    setEndTime("");
+    const selectedStartTime = event.target.value;
+    setStartTime(selectedStartTime);
+
+    const nextEndTime = timeSlots.find(
+      (slot) => getHour(slot) > getHour(selectedStartTime)
+    );
+
+    setEndTime(nextEndTime || "");
   };
 
-  const handleConfirmBooking = (event) => {
+  const handleBookingSubmit = (event) => {
     event.preventDefault();
 
     if (!date || !startTime || !endTime) {
-      toast.error("Please select date, start time, and end time");
+      toast.error("Please select date and time");
+      return;
+    }
+
+    if (getHour(endTime) <= getHour(startTime)) {
+      toast.error("End time must be after start time");
       return;
     }
 
@@ -62,68 +71,67 @@ const BookingModal = ({ room, onClose }) => {
       date,
       startTime,
       endTime,
-      totalCost,
       specialNote,
-      status: "confirmed",
+      totalCost,
     };
 
     console.log(bookingData);
 
-    toast.success("Booking form is ready. Backend will be connected later.");
+    toast.success("Booking request created successfully");
+
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 px-4 py-6">
-      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] bg-white p-5 shadow-2xl md:p-8">
-        <div className="mb-6 flex items-start justify-between gap-5">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl"
+      >
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-emerald-600">
-              Confirm Study Room Booking
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">
-              {room.roomName}
+            <h2 className="text-2xl font-black text-slate-950">
+              Book {room.roomName}
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              ${room.hourlyRate}/hr · {room.capacity} people · {room.floor}
+            <p className="mt-1 text-slate-500">
+              Select your preferred date and time slot.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"
           >
             <X size={22} />
           </button>
         </div>
 
-        <form onSubmit={handleConfirmBooking} className="space-y-5">
+        <form onSubmit={handleBookingSubmit} className="grid gap-5">
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Booking Date
-            </label>
+            <label className="mb-2 block font-semibold">Booking Date</label>
             <input
               type="date"
               min={getTodayDate()}
               value={date}
               onChange={(event) => setDate(event.target.value)}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
               required
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
             />
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Start Time
-              </label>
+              <label className="mb-2 block font-semibold">Start Time</label>
               <select
                 value={startTime}
                 onChange={handleStartTimeChange}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
                 required
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
               >
-                <option value="">Select start time</option>
                 {timeSlots.slice(0, -1).map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
@@ -133,18 +141,14 @@ const BookingModal = ({ room, onClose }) => {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                End Time
-              </label>
+              <label className="mb-2 block font-semibold">End Time</label>
               <select
                 value={endTime}
                 onChange={(event) => setEndTime(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
                 required
-                disabled={!startTime}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-100"
               >
-                <option value="">Select end time</option>
-                {endTimeOptions.map((slot) => (
+                {availableEndTimes.map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
                   </option>
@@ -153,44 +157,41 @@ const BookingModal = ({ room, onClose }) => {
             </div>
           </div>
 
-          <div className="rounded-3xl bg-emerald-50 p-5">
+          <div>
+            <label className="mb-2 block font-semibold">Special Note</label>
+            <textarea
+              rows="3"
+              value={specialNote}
+              onChange={(event) => setSpecialNote(event.target.value)}
+              placeholder="Write any special request..."
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div className="rounded-2xl bg-emerald-50 p-4">
             <p className="text-sm font-semibold text-emerald-700">
               Total Cost
             </p>
-            <h3 className="mt-1 text-3xl font-bold text-emerald-800">
+            <p className="text-3xl font-black text-emerald-700">
               ${totalCost}
-            </h3>
-            <p className="mt-1 text-sm text-emerald-700">
-              Calculated from selected time duration and hourly rate.
             </p>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Special Note
-            </label>
-            <textarea
-              rows="4"
-              value={specialNote}
-              onChange={(event) => setSpecialNote(event.target.value)}
-              placeholder="Optional note for the room owner..."
-              className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-            ></textarea>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <PrimaryButton type="submit" className="w-full sm:w-auto">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700"
+            >
               Confirm Booking
-            </PrimaryButton>
+            </button>
 
-            <PrimaryButton
+            <button
               type="button"
-              variant="light"
               onClick={onClose}
-              className="w-full sm:w-auto"
+              className="rounded-xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300"
             >
               Cancel
-            </PrimaryButton>
+            </button>
           </div>
         </form>
       </div>

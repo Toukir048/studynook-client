@@ -1,56 +1,70 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import EmptyState from "../components/EmptyState";
+import LoadingSpinner from "../components/LoadingSpinner";
 import RoomCard from "../components/RoomCard";
 import SectionHeader from "../components/SectionHeader";
-import { amenitiesOptions, demoRooms } from "../utils/demoRooms";
+import { getAllRooms } from "../api/roomsApi";
+import { amenitiesOptions } from "../utils/demoRooms";
 
 const Rooms = () => {
+  const [rooms, setRooms] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [selectedAmenity, setSelectedAmenity] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const filteredRooms = useMemo(() => {
-    return demoRooms.filter((room) => {
-      const matchesSearch = room.roomName
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
+  useEffect(() => {
+    const params = {};
 
-      const matchesAmenity = selectedAmenity
-        ? room.amenities.includes(selectedAmenity)
-        : true;
+    if (searchText.trim()) {
+      params.search = searchText.trim();
+    }
 
-      return matchesSearch && matchesAmenity;
-    });
+    if (selectedAmenity) {
+      params.amenities = selectedAmenity;
+    }
+
+    setLoading(true);
+
+    getAllRooms(params)
+      .then((data) => {
+        setRooms(data.rooms || []);
+      })
+      .catch(() => {
+        setRooms([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [searchText, selectedAmenity]);
 
   return (
     <>
       <Helmet>
-        <title>StudyNook – Available Rooms</title>
+        <title>All Rooms | StudyNook</title>
       </Helmet>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
+      <section className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
         <SectionHeader
-          eyebrow="Browse Rooms"
-          title="Available Study Rooms"
-          description="Search and filter study rooms by name and amenities. Backend MongoDB search will be connected later."
+          title="All Study Rooms"
+          subtitle="Search and filter available library study spaces."
         />
 
-        <div className="mt-8 grid gap-4 rounded-3xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_260px]">
+        <div className="mb-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
           <input
             type="text"
             placeholder="Search by room name..."
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
           />
 
           <select
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
             value={selectedAmenity}
             onChange={(event) => setSelectedAmenity(event.target.value)}
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
           >
-            <option value="">All amenities</option>
+            <option value="">All Amenities</option>
             {amenitiesOptions.map((amenity) => (
               <option key={amenity} value={amenity}>
                 {amenity}
@@ -59,22 +73,20 @@ const Rooms = () => {
           </select>
         </div>
 
-        <div className="mt-8">
-          {filteredRooms.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredRooms.map((room) => (
-                <RoomCard key={room._id} room={room} />
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="No rooms found"
-              description="Try changing your search keyword or selected amenity filter."
-              buttonText="Back to All Rooms"
-              buttonTo="/rooms"
-            />
-          )}
-        </div>
+        {loading ? (
+          <LoadingSpinner />
+        ) : rooms.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {rooms.map((room) => (
+              <RoomCard key={room._id} room={room} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No rooms found"
+            message="Try changing your search text or selected amenity."
+          />
+        )}
       </section>
     </>
   );

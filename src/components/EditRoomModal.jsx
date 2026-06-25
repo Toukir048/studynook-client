@@ -1,23 +1,28 @@
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import PrimaryButton from "./PrimaryButton";
+import toast from "react-hot-toast";
 import { amenitiesOptions } from "../utils/demoRooms";
 
-const EditRoomModal = ({ room, onClose, onUpdate }) => {
-  const [selectedAmenities, setSelectedAmenities] = useState(room.amenities || []);
+const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+
+  useEffect(() => {
+    if (room?.amenities) {
+      setSelectedAmenities(room.amenities);
+    }
+  }, [room]);
+
+  if (!isOpen || !room) return null;
 
   const handleAmenityChange = (amenity) => {
-    setSelectedAmenities((previousAmenities) => {
-      if (previousAmenities.includes(amenity)) {
-        return previousAmenities.filter((item) => item !== amenity);
-      }
-
-      return [...previousAmenities, amenity];
-    });
+    setSelectedAmenities((prevAmenities) =>
+      prevAmenities.includes(amenity)
+        ? prevAmenities.filter((item) => item !== amenity)
+        : [...prevAmenities, amenity]
+    );
   };
 
-  const handleUpdateRoom = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     if (selectedAmenities.length === 0) {
@@ -28,7 +33,6 @@ const EditRoomModal = ({ room, onClose, onUpdate }) => {
     const form = event.target;
 
     const updatedRoom = {
-      ...room,
       roomName: form.roomName.value,
       description: form.description.value,
       image: form.image.value,
@@ -39,162 +43,93 @@ const EditRoomModal = ({ room, onClose, onUpdate }) => {
     };
 
     onUpdate(updatedRoom);
-    toast.success("Room updated successfully");
-    onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 px-4 py-6">
-      <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] bg-white p-5 shadow-2xl md:p-8">
-        <div className="mb-6 flex items-start justify-between gap-5">
-          <div>
-            <p className="text-sm font-semibold text-emerald-600">
-              Edit Listing
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">
-              Update Room Information
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              This is a frontend modal. Backend update API will be connected later.
-            </p>
-          </div>
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4">
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-black text-slate-950">Edit Room</h2>
           <button
             onClick={onClose}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+            className="rounded-full bg-slate-100 p-2 text-slate-600"
           >
-            <X size={22} />
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleUpdateRoom} className="space-y-5">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Room Name
-              </label>
-              <input
-                type="text"
-                name="roomName"
-                required
-                defaultValue={room.roomName}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="grid gap-5">
+          <input
+            name="roomName"
+            defaultValue={room.roomName}
+            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            required
+          />
 
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Description
-              </label>
-              <textarea
-                name="description"
-                required
-                rows="4"
-                defaultValue={room.description}
-                className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-              ></textarea>
-            </div>
+          <input
+            name="image"
+            defaultValue={room.image}
+            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            required
+          />
 
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Image URL
-              </label>
-              <input
-                type="url"
-                name="image"
-                required
-                defaultValue={room.image}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-              />
-            </div>
+          <textarea
+            name="description"
+            defaultValue={room.description}
+            rows="4"
+            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            required
+          />
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Floor
-              </label>
-              <input
-                type="text"
-                name="floor"
-                required
-                defaultValue={room.floor}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-              />
-            </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <input
+              name="floor"
+              defaultValue={room.floor}
+              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              required
+            />
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Capacity
-              </label>
-              <input
-                type="number"
-                name="capacity"
-                required
-                min="1"
-                defaultValue={room.capacity}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-              />
-            </div>
+            <input
+              name="capacity"
+              type="number"
+              min="1"
+              defaultValue={room.capacity}
+              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              required
+            />
 
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Hourly Rate
-              </label>
-              <input
-                type="number"
-                name="hourlyRate"
-                required
-                min="1"
-                defaultValue={room.hourlyRate}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
-              />
-            </div>
+            <input
+              name="hourlyRate"
+              type="number"
+              min="1"
+              defaultValue={room.hourlyRate}
+              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              required
+            />
+          </div>
 
-            <div className="md:col-span-2">
-              <label className="mb-3 block text-sm font-semibold text-slate-700">
-                Amenities
-              </label>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                {amenitiesOptions.map((amenity) => {
-                  const isSelected = selectedAmenities.includes(amenity);
-
-                  return (
-                    <label
-                      key={amenity}
-                      className={`cursor-pointer rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                        isSelected
-                          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                          : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleAmenityChange(amenity)}
-                        className="mr-2 accent-emerald-600"
-                      />
-                      {amenity}
-                    </label>
-                  );
-                })}
-              </div>
+          <div>
+            <h3 className="mb-3 font-bold">Amenities</h3>
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+              {amenitiesOptions.map((amenity) => (
+                <label
+                  key={amenity}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 p-3"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedAmenities.includes(amenity)}
+                    onChange={() => handleAmenityChange(amenity)}
+                  />
+                  <span>{amenity}</span>
+                </label>
+              ))}
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <PrimaryButton type="submit" className="w-full sm:w-auto">
-              Update Room
-            </PrimaryButton>
-
-            <PrimaryButton
-              type="button"
-              variant="light"
-              onClick={onClose}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </PrimaryButton>
-          </div>
+          <button className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">
+            Update Room
+          </button>
         </form>
       </div>
     </div>
