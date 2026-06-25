@@ -76,6 +76,7 @@ export const demoRooms = [
   {
     _id: "study-suite-f6",
     roomName: "Study Suite F6",
+    ownerEmail: "njumtanvir117@gmail.com",
     description:
       "A premium quiet suite for small teams, thesis work, and long focused study sessions.",
     image:
@@ -85,5 +86,6 @@ export const demoRooms = [
     hourlyRate: 10,
     amenities: ["Quiet Zone", "Air Conditioning", "Wi-Fi", "Power Outlets"],
     bookingCount: 15,
+    
   },
 ];
