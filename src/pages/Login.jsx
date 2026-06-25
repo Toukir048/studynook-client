@@ -22,8 +22,8 @@ const Login = () => {
         toast.success("Login successful");
         navigate(from, { replace: true });
       })
-      .catch(() => {
-        toast.error("Invalid email or password");
+      .catch((error) => {
+        toast.error(error.message || "Invalid email or password");
       });
   };
 
@@ -33,8 +33,8 @@ const Login = () => {
         toast.success("Google login successful");
         navigate(from, { replace: true });
       })
-      .catch(() => {
-        toast.error("Google login failed");
+      .catch((error) => {
+        toast.error(error.message || "Google login failed");
       });
   };
 

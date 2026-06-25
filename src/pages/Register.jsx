@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 
 const Register = () => {
-    const { createUser, updateUserProfile, loginWithGoogle } = useAuth();
+    const { createUser, loginWithGoogle } = useAuth();
     const [passwordError, setPasswordError] = useState("");
     const navigate = useNavigate();
 
@@ -42,15 +42,13 @@ const Register = () => {
             return;
         }
 
-        createUser(email, password)
-            .then(() => updateUserProfile(name, photoURL))
+        createUser(name, email, photoURL, password)
             .then(() => {
                 toast.success("Registration successful! Please login.");
                 navigate("/login");
             })
             .catch((error) => {
-                console.log(error);
-                toast.error(error.message);
+                toast.error(error.message || "Registration failed");
             });
     };
 
