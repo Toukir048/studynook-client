@@ -111,8 +111,7 @@ const Register = () => {
                         <input
                             type="text"
                             name="photoURL"
-                            required
-                            placeholder="Photo URL"
+                            placeholder="Photo URL (optional)"
                             className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
                         />
 

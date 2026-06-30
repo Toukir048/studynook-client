@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 import { applyTheme, getStoredTheme, storeTheme } from "../utils/theme";
 
+const defaultAvatar = "/default-avatar.svg";
+
 const navLinkClass = ({ isActive }) =>
   isActive
     ? "text-emerald-600 font-semibold dark:text-emerald-400"
@@ -58,8 +60,11 @@ const Navbar = () => {
     </button>
   );
 
-  const userPhoto =
-    user?.photoURL || "https://i.ibb.co/2KQnYp7/default-avatar.png";
+  const handleAvatarError = (event) => {
+    event.currentTarget.src = defaultAvatar;
+  };
+
+  const userPhoto = user?.photoURL || defaultAvatar;
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
@@ -118,6 +123,7 @@ const Navbar = () => {
                   <img
                     src={userPhoto}
                     alt={user.displayName || "User"}
+                    onError={handleAvatarError}
                     className="h-10 w-10 rounded-full object-cover"
                   />
 
@@ -260,6 +266,7 @@ const Navbar = () => {
                     <img
                       src={userPhoto}
                       alt={user.displayName || "User"}
+                      onError={handleAvatarError}
                       className="h-12 w-12 rounded-full object-cover"
                     />
 

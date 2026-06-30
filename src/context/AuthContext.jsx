@@ -21,7 +21,28 @@ export const AuthContext = createContext(null);
 
 const googleProvider = new GoogleAuthProvider();
 
-const defaultPhotoURL = "https://i.ibb.co/2KQnYp7/default-avatar.png";
+const defaultPhotoURL = "/default-avatar.svg";
+
+const getSafePhotoURL = (photoURL) => {
+  if (typeof photoURL !== "string") return defaultPhotoURL;
+
+  const trimmedPhotoURL = photoURL.trim();
+
+  if (!trimmedPhotoURL) return defaultPhotoURL;
+  if (trimmedPhotoURL === "null" || trimmedPhotoURL === "undefined") {
+    return defaultPhotoURL;
+  }
+  if (trimmedPhotoURL.endsWith("/default-avatar.png")) {
+    return defaultPhotoURL;
+  }
+
+  const isLocalPath = trimmedPhotoURL.startsWith("/");
+  const isRemoteURL =
+    trimmedPhotoURL.startsWith("http://") ||
+    trimmedPhotoURL.startsWith("https://");
+
+  return isLocalPath || isRemoteURL ? trimmedPhotoURL : defaultPhotoURL;
+};
 
 const normalizeUser = (backendUser) => {
   if (!backendUser) return null;
@@ -29,14 +50,14 @@ const normalizeUser = (backendUser) => {
   return {
     ...backendUser,
     displayName: backendUser.name || backendUser.displayName,
-    photoURL: backendUser.photoURL || defaultPhotoURL,
+    photoURL: getSafePhotoURL(backendUser.photoURL),
   };
 };
 
 const getStoredUser = () => {
   try {
     const storedUser = localStorage.getItem("studynook-user");
-    return storedUser ? JSON.parse(storedUser) : null;
+    return storedUser ? normalizeUser(JSON.parse(storedUser)) : null;
   } catch {
     return null;
   }
@@ -60,6 +81,7 @@ const AuthProvider = ({ children }) => {
 
   const createUser = async (name, email, photoURL, password) => {
     setAuthLoading(true);
+    const safePhotoURL = getSafePhotoURL(photoURL);
 
     try {
       const firebaseCredential = await createUserWithEmailAndPassword(
@@ -70,13 +92,13 @@ const AuthProvider = ({ children }) => {
 
       await updateProfile(firebaseCredential.user, {
         displayName: name,
-        photoURL: photoURL || defaultPhotoURL,
+        photoURL: safePhotoURL,
       });
 
       const data = await registerUserInDB({
         name,
         email,
-        photoURL: photoURL || defaultPhotoURL,
+        photoURL: safePhotoURL,
         password,
       });
 
@@ -104,7 +126,7 @@ const AuthProvider = ({ children }) => {
 
           await updateProfile(firebaseCredential.user, {
             displayName: data.user?.name || "StudyNook User",
-            photoURL: data.user?.photoURL || defaultPhotoURL,
+            photoURL: getSafePhotoURL(data.user?.photoURL),
           });
         } catch {
           // Firebase persistence failed, but backend login is already successful.
@@ -128,7 +150,7 @@ const AuthProvider = ({ children }) => {
       const data = await googleLoginInDB({
         name: firebaseUser.displayName || "StudyNook User",
         email: firebaseUser.email,
-        photoURL: firebaseUser.photoURL || defaultPhotoURL,
+        photoURL: getSafePhotoURL(firebaseUser.photoURL),
       });
 
       setUser(data.user);
