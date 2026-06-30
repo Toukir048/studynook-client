@@ -66,7 +66,7 @@ const AddRoom = () => {
               description="Create a clear room listing with pricing, capacity, floor details, and useful amenities for students."
             />
 
-            <div className="mt-8 rounded-[2rem] bg-slate-950 p-6 text-white">
+            <div className="mt-8 rounded-[2rem] bg-slate-950 p-6 text-white dark:border dark:border-slate-800">
               <h3 className="text-xl font-bold">Room listing checklist</h3>
 
               <div className="mt-5 space-y-4 text-sm text-slate-300">
@@ -95,14 +95,14 @@ const AddRoom = () => {
 
           <form
             onSubmit={handleAddRoom}
-            className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm md:p-8"
+            className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-8"
           >
             <div className="grid gap-5 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Room Name
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500">
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500 dark:border-slate-700 dark:focus-within:border-emerald-500">
                   <FileText size={18} className="text-slate-400" />
                   <input
                     type="text"
@@ -115,7 +115,7 @@ const AddRoom = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Description
                 </label>
                 <textarea
@@ -123,15 +123,15 @@ const AddRoom = () => {
                   required
                   rows="5"
                   placeholder="Write a helpful description about the room environment, use case, and facilities."
-                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
                 ></textarea>
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Image URL
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500">
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500 dark:border-slate-700 dark:focus-within:border-emerald-500">
                   <ImagePlus size={18} className="text-slate-400" />
                   <input
                     type="url"
@@ -144,10 +144,10 @@ const AddRoom = () => {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Floor
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500">
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500 dark:border-slate-700 dark:focus-within:border-emerald-500">
                   <Layers size={18} className="text-slate-400" />
                   <input
                     type="text"
@@ -160,10 +160,10 @@ const AddRoom = () => {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Capacity
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500">
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500 dark:border-slate-700 dark:focus-within:border-emerald-500">
                   <Users size={18} className="text-slate-400" />
                   <input
                     type="number"
@@ -177,10 +177,10 @@ const AddRoom = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Hourly Rate
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500">
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-emerald-500 dark:border-slate-700 dark:focus-within:border-emerald-500">
                   <DollarSign size={18} className="text-slate-400" />
                   <input
                     type="number"
@@ -194,7 +194,7 @@ const AddRoom = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-3 block text-sm font-semibold text-slate-700">
+                <label className="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                   Amenities
                 </label>
 
@@ -206,8 +206,8 @@ const AddRoom = () => {
                       <label
                         key={amenity}
                         className={`cursor-pointer rounded-2xl border px-4 py-3 text-sm font-semibold transition ${isSelected
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                            : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300"
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-emerald-500"
                           }`}
                       >
                         <input

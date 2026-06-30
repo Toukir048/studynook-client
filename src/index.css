@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 * {
   box-sizing: border-box;
 }
@@ -12,6 +14,70 @@ body {
   color: #0f172a;
 }
 
+.dark body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
 a {
   text-decoration: none;
+}
+
+.dark input:not([type="checkbox"]),
+.dark select,
+.dark textarea {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #94a3b8;
+}
+
+button,
+[role="button"],
+a[class*="rounded"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+[role="button"],
+a[class*="rounded"] {
+  transition-duration: 180ms;
+  transition-property: background-color, border-color, color, box-shadow,
+    opacity, transform;
+  transition-timing-function: ease;
+}
+
+button:not(:disabled),
+[role="button"],
+a[href] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+button:focus-visible,
+[role="button"]:focus-visible,
+a[href]:focus-visible {
+  outline: 3px solid rgba(16, 185, 129, 0.35);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  button:not(:disabled):hover,
+  a[class*="rounded"]:hover {
+    transform: translateY(-1px);
+  }
+}
+
+button:not(:disabled):active,
+a[class*="rounded"]:active {
+  transform: translateY(0) scale(0.98);
 }

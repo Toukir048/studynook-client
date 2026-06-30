@@ -88,11 +88,11 @@ const MyListings = () => {
             Logged in as {user?.email}
           </p>
 
-          <h1 className="text-3xl font-black text-slate-950 md:text-4xl">
+          <h1 className="text-3xl font-black text-slate-950 dark:text-white md:text-4xl">
             My Listed Rooms
           </h1>
 
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 text-slate-600 dark:text-slate-300">
             Manage the study rooms you have added to StudyNook.
           </p>
         </div>
@@ -110,7 +110,7 @@ const MyListings = () => {
             {myRooms.map((room) => (
               <div
                 key={room._id}
-                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
               >
                 <img
                   src={room.image}
@@ -121,35 +121,35 @@ const MyListings = () => {
                 <div className="p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h2 className="text-2xl font-black text-slate-950">
+                      <h2 className="text-2xl font-black text-slate-950 dark:text-white">
                         {room.roomName}
                       </h2>
-                      <p className="mt-1 text-slate-500">{room.floor}</p>
+                      <p className="mt-1 text-slate-500 dark:text-slate-400">{room.floor}</p>
                     </div>
 
-                    <p className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
+                    <p className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                       {room.bookingCount || 0} bookings
                     </p>
                   </div>
 
-                  <p className="mt-4 text-slate-600">{room.description}</p>
+                  <p className="mt-4 text-slate-600 dark:text-slate-300">{room.description}</p>
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     {room.amenities?.map((amenity) => (
                       <span
                         key={amenity}
-                        className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700"
+                        className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                       >
                         {amenity}
                       </span>
                     ))}
                   </div>
 
-                  <div className="mt-6 flex flex-wrap gap-3">
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <button
                       type="button"
                       onClick={() => setSelectedRoom(room)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-slate-800"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-slate-800 sm:w-auto"
                     >
                       <Edit size={18} /> Edit
                     </button>
@@ -157,7 +157,7 @@ const MyListings = () => {
                     <button
                       type="button"
                       onClick={() => setDeleteTarget(room)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700 sm:w-auto"
                     >
                       <Trash2 size={18} /> Delete
                     </button>

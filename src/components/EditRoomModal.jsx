@@ -47,12 +47,13 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4">
-      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl dark:border dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-black text-slate-950">Edit Room</h2>
+          <h2 className="text-2xl font-black text-slate-950 dark:text-white">Edit Room</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 p-2 text-slate-600"
+            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             <X size={20} />
           </button>
@@ -62,14 +63,14 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
           <input
             name="roomName"
             defaultValue={room.roomName}
-            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
             required
           />
 
           <input
             name="image"
             defaultValue={room.image}
-            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
             required
           />
 
@@ -77,7 +78,7 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
             name="description"
             defaultValue={room.description}
             rows="4"
-            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
             required
           />
 
@@ -85,7 +86,7 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
             <input
               name="floor"
               defaultValue={room.floor}
-              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
               required
             />
 
@@ -94,7 +95,7 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
               type="number"
               min="1"
               defaultValue={room.capacity}
-              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
               required
             />
 
@@ -103,18 +104,18 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
               type="number"
               min="1"
               defaultValue={room.hourlyRate}
-              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              className="rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
               required
             />
           </div>
 
           <div>
-            <h3 className="mb-3 font-bold">Amenities</h3>
+            <h3 className="mb-3 font-bold dark:text-white">Amenities</h3>
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
               {amenitiesOptions.map((amenity) => (
                 <label
                   key={amenity}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 p-3"
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700 dark:text-slate-200"
                 >
                   <input
                     type="checkbox"
@@ -127,7 +128,7 @@ const EditRoomModal = ({ isOpen, room, onClose, onUpdate }) => {
             </div>
           </div>
 
-          <button className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">
+          <button className="w-full rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700 sm:w-auto">
             Update Room
           </button>
         </form>

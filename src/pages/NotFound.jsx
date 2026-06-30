@@ -10,18 +10,18 @@ const NotFound = () => {
       </Helmet>
 
       <section className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
             <SearchX size={40} />
           </div>
 
           <p className="text-lg font-bold text-emerald-600">404 Error</p>
 
-          <h1 className="mt-3 text-4xl font-black text-slate-950 md:text-5xl">
+          <h1 className="mt-3 text-4xl font-black text-slate-950 dark:text-white md:text-5xl">
             Page Not Found
           </h1>
 
-          <p className="mx-auto mt-4 max-w-xl text-slate-600">
+          <p className="mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-300">
             The page you are looking for may have been moved, deleted, or does
             not exist. Please return to the homepage and continue browsing
             StudyNook.

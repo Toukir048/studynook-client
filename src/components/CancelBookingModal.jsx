@@ -10,23 +10,23 @@ const CancelBookingModal = ({ isOpen, booking, onClose, onConfirm }) => {
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl dark:border dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-black text-slate-950">
+          <h2 className="text-xl font-black text-slate-950 dark:text-white">
             Cancel this booking?
           </h2>
 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"
+            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             <X size={20} />
           </button>
         </div>
 
-        <p className="text-slate-600">
+        <p className="text-slate-600 dark:text-slate-300">
           You are cancelling your booking for{" "}
           <span className="font-bold">{booking.roomName}</span> on{" "}
           <span className="font-bold">{booking.date}</span> from{" "}
@@ -34,11 +34,11 @@ const CancelBookingModal = ({ isOpen, booking, onClose, onConfirm }) => {
           <span className="font-bold">{booking.endTime}</span>.
         </p>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300"
+            className="w-full rounded-xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:w-auto"
           >
             Keep Booking
           </button>
@@ -46,7 +46,7 @@ const CancelBookingModal = ({ isOpen, booking, onClose, onConfirm }) => {
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-xl bg-red-600 px-5 py-3 font-bold text-white hover:bg-red-700"
+            className="w-full rounded-xl bg-red-600 px-5 py-3 font-bold text-white hover:bg-red-700 sm:w-auto"
           >
             Cancel Booking
           </button>

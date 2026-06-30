@@ -98,14 +98,14 @@ const BookingModal = ({ isOpen, onClose, room }) => {
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl"
+        className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl dark:border dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-black text-slate-950">
+            <h2 className="text-2xl font-black text-slate-950 dark:text-white">
               Book {room.roomName}
             </h2>
-            <p className="mt-1 text-slate-500">
+            <p className="mt-1 text-slate-500 dark:text-slate-400">
               Select your preferred date and time slot.
             </p>
           </div>
@@ -113,7 +113,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"
+            className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             <X size={22} />
           </button>
@@ -121,24 +121,24 @@ const BookingModal = ({ isOpen, onClose, room }) => {
 
         <form onSubmit={handleBookingSubmit} className="grid gap-5">
           <div>
-            <label className="mb-2 block font-semibold">Booking Date</label>
+            <label className="mb-2 block font-semibold dark:text-slate-200">Booking Date</label>
             <input
               type="date"
               min={getTodayDate()}
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
               required
             />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block font-semibold">Start Time</label>
+              <label className="mb-2 block font-semibold dark:text-slate-200">Start Time</label>
               <select
                 value={startTime}
                 onChange={handleStartTimeChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
                 required
               >
                 {timeSlots.slice(0, -1).map((slot) => (
@@ -150,11 +150,11 @@ const BookingModal = ({ isOpen, onClose, room }) => {
             </div>
 
             <div>
-              <label className="mb-2 block font-semibold">End Time</label>
+              <label className="mb-2 block font-semibold dark:text-slate-200">End Time</label>
               <select
                 value={endTime}
                 onChange={(event) => setEndTime(event.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
                 required
               >
                 {availableEndTimes.map((slot) => (
@@ -167,30 +167,30 @@ const BookingModal = ({ isOpen, onClose, room }) => {
           </div>
 
           <div>
-            <label className="mb-2 block font-semibold">Special Note</label>
+            <label className="mb-2 block font-semibold dark:text-slate-200">Special Note</label>
             <textarea
               rows="3"
               value={specialNote}
               onChange={(event) => setSpecialNote(event.target.value)}
               placeholder="Write any special request..."
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 dark:border-slate-700"
             />
           </div>
 
-          <div className="rounded-2xl bg-emerald-50 p-4">
-            <p className="text-sm font-semibold text-emerald-700">
+          <div className="rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
+            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
               Estimated Total
             </p>
-            <p className="text-3xl font-black text-emerald-700">
+            <p className="text-3xl font-black text-emerald-700 dark:text-emerald-300">
               ${totalCost}
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:flex-wrap">
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
+              className="w-full rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300 sm:w-auto"
             >
               {submitting ? "Booking..." : "Confirm Booking"}
             </button>
@@ -198,7 +198,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300"
+              className="w-full rounded-xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:w-auto"
             >
               Cancel
             </button>

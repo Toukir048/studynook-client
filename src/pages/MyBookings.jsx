@@ -24,8 +24,8 @@ const StatusBadge = ({ status }) => {
     <span
       className={`rounded-full px-3 py-1 text-sm font-bold ${
         isConfirmed
-          ? "bg-emerald-50 text-emerald-700"
-          : "bg-red-50 text-red-700"
+          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+          : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
       }`}
     >
       {status}
@@ -93,11 +93,11 @@ const MyBookings = () => {
             Logged in as {user?.email}
           </p>
 
-          <h1 className="text-3xl font-black text-slate-950 md:text-4xl">
+          <h1 className="text-3xl font-black text-slate-950 dark:text-white md:text-4xl">
             My Bookings
           </h1>
 
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 text-slate-600 dark:text-slate-300">
             View and manage your study room bookings.
           </p>
         </div>
@@ -115,7 +115,7 @@ const MyBookings = () => {
             {bookings.map((booking) => (
               <div
                 key={booking._id}
-                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm md:flex"
+                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 md:flex"
               >
                 <img
                   src={booking.roomImage || booking.room?.image}
@@ -126,46 +126,46 @@ const MyBookings = () => {
                 <div className="flex-1 p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h2 className="text-2xl font-black text-slate-950">
+                      <h2 className="text-2xl font-black text-slate-950 dark:text-white">
                         {booking.roomName}
                       </h2>
 
-                      <p className="mt-1 text-slate-500">{booking.floor}</p>
+                      <p className="mt-1 text-slate-500 dark:text-slate-400">{booking.floor}</p>
                     </div>
 
                     <StatusBadge status={booking.status} />
                   </div>
 
                   <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-2xl bg-slate-100 p-4">
+                    <div className="rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
                       <CalendarCheck
                         className="mb-2 text-emerald-600"
                         size={22}
                       />
-                      <p className="text-sm text-slate-500">Date</p>
-                      <p className="font-bold">{booking.date}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Date</p>
+                      <p className="font-bold dark:text-slate-100">{booking.date}</p>
                     </div>
 
-                    <div className="rounded-2xl bg-slate-100 p-4">
+                    <div className="rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
                       <Clock className="mb-2 text-emerald-600" size={22} />
-                      <p className="text-sm text-slate-500">Time</p>
-                      <p className="font-bold">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Time</p>
+                      <p className="font-bold dark:text-slate-100">
                         {booking.startTime} - {booking.endTime}
                       </p>
                     </div>
 
-                    <div className="rounded-2xl bg-slate-100 p-4">
+                    <div className="rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
                       <DollarSign
                         className="mb-2 text-emerald-600"
                         size={22}
                       />
-                      <p className="text-sm text-slate-500">Total Cost</p>
-                      <p className="font-bold">${booking.totalCost}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Total Cost</p>
+                      <p className="font-bold dark:text-slate-100">${booking.totalCost}</p>
                     </div>
                   </div>
 
                   {booking.specialNote && (
-                    <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-slate-600">
+                    <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                       <span className="font-bold">Note:</span>{" "}
                       {booking.specialNote}
                     </p>
@@ -176,7 +176,7 @@ const MyBookings = () => {
                       <button
                         type="button"
                         onClick={() => setCancelTarget(booking)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700 sm:w-auto"
                       >
                         <XCircle size={18} /> Cancel Booking
                       </button>
@@ -184,7 +184,7 @@ const MyBookings = () => {
                       <button
                         type="button"
                         disabled
-                        className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-200 px-5 py-3 font-semibold text-slate-500"
+                        className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-5 py-3 font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400 sm:w-auto"
                       >
                         Cancel unavailable
                       </button>

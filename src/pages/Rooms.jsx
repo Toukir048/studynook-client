@@ -58,7 +58,7 @@ const Rooms = () => {
           subtitle="Search and filter available library study spaces."
         />
 
-        <div className="mb-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
+        <div className="mb-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:grid-cols-2">
           <input
             type="text"
             placeholder="Search by room name..."

@@ -112,7 +112,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-white py-16 dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <SectionHeader
             title="How StudyNook Works"
@@ -120,26 +120,26 @@ const Home = () => {
           />
 
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 p-6">
+            <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-800 dark:bg-slate-950/50">
               <Search className="mb-4 text-emerald-600" size={34} />
-              <h3 className="text-xl font-bold">Find a Room</h3>
-              <p className="mt-2 text-slate-600">
+              <h3 className="text-xl font-bold dark:text-white">Find a Room</h3>
+              <p className="mt-2 text-slate-600 dark:text-slate-300">
                 Search rooms by name and filter by amenities.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 p-6">
+            <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-800 dark:bg-slate-950/50">
               <CalendarCheck className="mb-4 text-emerald-600" size={34} />
-              <h3 className="text-xl font-bold">Book a Slot</h3>
-              <p className="mt-2 text-slate-600">
+              <h3 className="text-xl font-bold dark:text-white">Book a Slot</h3>
+              <p className="mt-2 text-slate-600 dark:text-slate-300">
                 Choose your preferred date and time slot.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 p-6">
+            <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-800 dark:bg-slate-950/50">
               <ShieldCheck className="mb-4 text-emerald-600" size={34} />
-              <h3 className="text-xl font-bold">Manage Safely</h3>
-              <p className="mt-2 text-slate-600">
+              <h3 className="text-xl font-bold dark:text-white">Manage Safely</h3>
+              <p className="mt-2 text-slate-600 dark:text-slate-300">
                 View your bookings and manage your listed rooms securely.
               </p>
             </div>
