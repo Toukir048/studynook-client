@@ -157,21 +157,10 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async () => {
       setAuthLoading(true);
 
       try {
-        if (firebaseUser?.email) {
-          const data = await googleLoginInDB({
-            name: firebaseUser.displayName || "StudyNook User",
-            email: firebaseUser.email,
-            photoURL: firebaseUser.photoURL || defaultPhotoURL,
-          });
-
-          setUser(data.user);
-          return;
-        }
-
         const data = await getLoggedInUser();
         setUser(data.user);
       } catch {

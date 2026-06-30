@@ -7,6 +7,7 @@ import useAuth from "../hooks/useAuth";
 const Register = () => {
     const { createUser, loginWithGoogle } = useAuth();
     const [passwordError, setPasswordError] = useState("");
+    const [submitting, setSubmitting] = useState(false);
     const navigate = useNavigate();
 
     const validatePassword = (password) => {
@@ -25,8 +26,19 @@ const Register = () => {
         return "";
     };
 
-    const handleRegister = (event) => {
+    const getRegisterErrorMessage = (error) => {
+        if (error?.code === "auth/email-already-in-use") {
+            return "User already exists";
+        }
+
+        return error?.response?.data?.message || error?.message || "Registration failed";
+    };
+
+    const handleRegister = async (event) => {
         event.preventDefault();
+
+        if (submitting) return;
+
         setPasswordError("");
 
         const form = event.target;
@@ -42,14 +54,17 @@ const Register = () => {
             return;
         }
 
-        createUser(name, email, photoURL, password)
-            .then(() => {
-                toast.success("Registration successful! Please login.");
-                navigate("/login");
-            })
-            .catch((error) => {
-                toast.error(error.message || "Registration failed");
-            });
+        setSubmitting(true);
+
+        try {
+            await createUser(name, email, photoURL, password);
+            toast.success("Registration successful! Please login.");
+            navigate("/login");
+        } catch (error) {
+            toast.error(getRegisterErrorMessage(error));
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -115,13 +130,18 @@ const Register = () => {
                             </p>
                         )}
 
-                        <button className="w-full rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
-                            Register
+                        <button
+                            type="submit"
+                            disabled={submitting}
+                            className="w-full rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
+                        >
+                            {submitting ? "Registering..." : "Register"}
                         </button>
 
                         <button
                             onClick={handleGoogleLogin}
                             type="button"
+                            disabled={submitting}
                             className="w-full rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500 dark:hover:text-emerald-400"
                         >
                             Continue with Google
